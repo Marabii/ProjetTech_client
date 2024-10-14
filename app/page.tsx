@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Filters {
   Date_de_naissance_gte?: string;
@@ -33,9 +33,40 @@ interface Filters {
   "electifs.semestre_d_electif"?: string;
 }
 
+import type { Stage, Diplome, Electif, Etudiant } from "@/interfaces/students";
+import debounce from "lodash.debounce";
+
 const App: React.FC = () => {
   const [filters, setFilters] = useState<Filters>({});
-  const [results, setResults] = useState<any>(null);
+  const [results, setResults] = useState<Etudiant[] | null>(null);
+  const [suggestions, setSuggestions] = useState<{ [key: string]: string[] }>(
+    {}
+  );
+
+  // Debounced function to fetch suggestions
+  const fetchSuggestions = debounce(
+    async (fieldName: string, value: string) => {
+      if (value.length < 2) {
+        setSuggestions((prev) => ({ ...prev, [fieldName]: [] }));
+        return;
+      }
+
+      try {
+        const res = await fetch(
+          `${
+            process.env.NEXT_PUBLIC_BACKEND
+          }/api/suggestions?field=${encodeURIComponent(
+            fieldName
+          )}&query=${encodeURIComponent(value)}`
+        );
+        const data = await res.json();
+        setSuggestions((prev) => ({ ...prev, [fieldName]: data.suggestions }));
+      } catch (error) {
+        console.error("Error fetching suggestions:", error);
+      }
+    },
+    300
+  );
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -44,6 +75,19 @@ const App: React.FC = () => {
       ...filters,
       [e.target.name]: e.target.value,
     });
+
+    fetchSuggestions(e.target.name, e.target.value);
+  };
+
+  // Function to select a suggestion
+  const handleSuggestionClick = (fieldName: string, suggestion: string) => {
+    setFilters({
+      ...filters,
+      [fieldName]: suggestion,
+    });
+
+    // Clear suggestions after selection
+    setSuggestions((prev) => ({ ...prev, [fieldName]: [] }));
   };
 
   const resetFilters = () => {
@@ -56,6 +100,11 @@ const App: React.FC = () => {
 
     // Construct the query object
     let query: any = {};
+
+    console.log(
+      "filters: ",
+      filters["Parcours.electifs.etablissement_electif"]
+    );
 
     // Personal Details
     if (filters.Date_de_naissance_gte || filters.Date_de_naissance_lte) {
@@ -177,27 +226,30 @@ const App: React.FC = () => {
     }
 
     // Electif Information
-    if (filters["electifs.type_electif"]) {
+    if (filters["Parcours.electifs.type_electif"]) {
       query["Parcours.electifs.type_electif"] =
-        filters["electifs.type_electif"];
+        filters["Parcours.electifs.type_electif"];
     }
-    if (filters["electifs.etablissement_electif"]) {
+    if (filters["Parcours.electifs.etablissement_electif"]) {
       query["Parcours.electifs.etablissement_electif"] =
-        filters["electifs.etablissement_electif"];
+        filters["Parcours.electifs.etablissement_electif"];
     }
-    if (filters["electifs.semestre_d_electif"]) {
+    if (filters["Parcours.electifs.semestre_d_electif"]) {
       query["Parcours.electifs.semestre_d_electif"] =
-        filters["electifs.semestre_d_electif"];
+        filters["Parcours.electifs.semestre_d_electif"];
     }
 
     try {
-      const response = await fetch("http://localhost:3001/students", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(query),
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BACKEND}/api/students`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(query),
+        }
+      );
 
       const data = await response.json();
       setResults(data);
@@ -279,6 +331,19 @@ const App: React.FC = () => {
                 onChange={handleChange}
                 className="w-full mt-2 p-2 border rounded-lg"
               />
+              {suggestions["nom"] && suggestions["nom"].length > 0 && (
+                <ul className="border border-gray-300 rounded-md mt-1 max-h-40 overflow-auto">
+                  {suggestions["nom"].map((suggestion, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleSuggestionClick("nom", suggestion)}
+                      className="p-2 cursor-pointer hover:bg-gray-200"
+                    >
+                      {suggestion}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             <div>
               <label className="block text-gray-700">prenom:</label>
@@ -289,6 +354,21 @@ const App: React.FC = () => {
                 onChange={handleChange}
                 className="w-full mt-2 p-2 border rounded-lg"
               />
+              {suggestions["prenom"] && suggestions["prenom"].length > 0 && (
+                <ul className="border border-gray-300 rounded-md mt-1 max-h-40 overflow-auto">
+                  {suggestions["prenom"].map((suggestion, index) => (
+                    <li
+                      key={index}
+                      onClick={() =>
+                        handleSuggestionClick("prenom", suggestion)
+                      }
+                      className="p-2 cursor-pointer hover:bg-gray-200"
+                    >
+                      {suggestion}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             <div>
               <label className="block text-gray-700">mail:</label>
@@ -299,6 +379,19 @@ const App: React.FC = () => {
                 onChange={handleChange}
                 className="w-full mt-2 p-2 border rounded-lg"
               />
+              {suggestions["mail"] && suggestions["mail"].length > 0 && (
+                <ul className="border border-gray-300 rounded-md mt-1 max-h-40 overflow-auto">
+                  {suggestions["mail"].map((suggestion, index) => (
+                    <li
+                      key={index}
+                      onClick={() => handleSuggestionClick("mail", suggestion)}
+                      className="p-2 cursor-pointer hover:bg-gray-200"
+                    >
+                      {suggestion}
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
             <div>
               <label className="block text-gray-700">Genre:</label>
@@ -564,11 +657,32 @@ const App: React.FC = () => {
               </label>
               <input
                 type="text"
-                name="diplomes.nom"
-                value={filters["diplomes.nom"] || ""}
+                name="Parcours.diplomes.nom"
+                value={filters["Parcours.diplomes.nom"] || ""}
                 onChange={handleChange}
                 className="w-full mt-2 p-2 border rounded-lg"
               />
+              {suggestions["Parcours.diplomes.nom"] &&
+                suggestions["Parcours.diplomes.nom"].length > 0 && (
+                  <ul className="border border-gray-300 rounded-md mt-1 max-h-40 overflow-auto">
+                    {suggestions["Parcours.diplomes.nom"].map(
+                      (suggestion, index) => (
+                        <li
+                          key={index}
+                          onClick={() =>
+                            handleSuggestionClick(
+                              "Parcours.diplomes.nom",
+                              suggestion
+                            )
+                          }
+                          className="p-2 cursor-pointer hover:bg-gray-200"
+                        >
+                          {suggestion}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                )}
             </div>
 
             {/* annee_d_obtention */}
@@ -624,11 +738,35 @@ const App: React.FC = () => {
               </label>
               <input
                 type="text"
-                name="electifs.etablissement_electif"
-                value={filters["electifs.etablissement_electif"] || ""}
+                name="Parcours.electifs.etablissement_electif"
+                value={filters["Parcours.electifs.etablissement_electif"] || ""}
                 onChange={handleChange}
                 className="w-full mt-2 p-2 border rounded-lg"
+                autoComplete="off"
               />
+              {/* Suggestions dropdown */}
+              {suggestions["Parcours.electifs.etablissement_electif"] &&
+                suggestions["Parcours.electifs.etablissement_electif"].length >
+                  0 && (
+                  <ul className="border border-gray-300 rounded-md mt-1 max-h-40 overflow-auto">
+                    {suggestions["Parcours.electifs.etablissement_electif"].map(
+                      (suggestion, index) => (
+                        <li
+                          key={index}
+                          onClick={() =>
+                            handleSuggestionClick(
+                              "Parcours.electifs.etablissement_electif",
+                              suggestion
+                            )
+                          }
+                          className="p-2 cursor-pointer hover:bg-gray-200"
+                        >
+                          {suggestion}
+                        </li>
+                      )
+                    )}
+                  </ul>
+                )}
             </div>
 
             {/* semestre_d_electif */}
@@ -667,13 +805,236 @@ const App: React.FC = () => {
         {/* Results */}
         <div className="mt-12">
           <h2 className="text-2xl font-bold text-center mb-6">Results</h2>
-          <pre className="bg-gray-200 p-4 rounded-lg overflow-auto">
-            {results
-              ? results.length !== 0
-                ? JSON.stringify(results, null, 2)
-                : "No student matches the filters"
-              : "No results yet."}
-          </pre>
+          {results ? (
+            results.length !== 0 ? (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {results.map((student: Etudiant, index: number) => (
+                  <div
+                    key={index}
+                    className="bg-white shadow-md rounded-lg p-6"
+                  >
+                    {/* Basic Information */}
+                    <h3 className="text-xl font-semibold mb-2">
+                      {student.nom} {student.prenom}
+                    </h3>
+                    <p className="text-gray-600 mb-1">
+                      <span className="font-medium">Email:</span> {student.mail}
+                    </p>
+                    <p className="text-gray-600 mb-1">
+                      <span className="font-medium">Date de Naissance:</span>{" "}
+                      {student.Date_de_naissance
+                        ? new Date(
+                            student.Date_de_naissance
+                          ).toLocaleDateString()
+                        : "N/A"}
+                    </p>
+                    <p className="text-gray-600 mb-1">
+                      <span className="font-medium">Année d'Entrée:</span>{" "}
+                      {student.annee_d_entree
+                        ? new Date(student.annee_d_entree).getFullYear()
+                        : "N/A"}
+                    </p>
+                    <p className="text-gray-600 mb-4">
+                      <span className="font-medium">Genre:</span>{" "}
+                      {student.Genre !== undefined
+                        ? student.Genre
+                          ? "Masculin"
+                          : "Féminin"
+                        : "N/A"}
+                    </p>
+
+                    {/* Parcours Section */}
+                    {student.Parcours && (
+                      <div className="mt-4">
+                        <h4 className="text-lg font-semibold mb-2">Parcours</h4>
+                        <p className="text-gray-600 mb-1">
+                          <span className="font-medium">Type de Bac:</span>{" "}
+                          {student.Parcours.type_de_bac || "N/A"}
+                        </p>
+                        <p className="text-gray-600 mb-1">
+                          <span className="font-medium">
+                            Filière d'Origine:
+                          </span>{" "}
+                          {student.Parcours.filiere_d_origine || "N/A"}
+                        </p>
+                        <p className="text-gray-600 mb-1">
+                          <span className="font-medium">Prépa d'Origine:</span>{" "}
+                          {student.Parcours.prepa_d_origine || "N/A"}
+                        </p>
+                        <p className="text-gray-600 mb-1">
+                          <span className="font-medium">Mode d'Admission:</span>{" "}
+                          {student.Parcours.mode_d_admission || "N/A"}
+                        </p>
+                        <p className="text-gray-600 mb-1">
+                          <span className="font-medium">Est Fusion:</span>{" "}
+                          {student.Parcours.est_fusion !== undefined
+                            ? student.Parcours.est_fusion
+                              ? "Oui"
+                              : "Non"
+                            : "N/A"}
+                        </p>
+
+                        {/* Autre Parcours Diplomant */}
+                        {student.Parcours.autre_parcours_diplomant && (
+                          <div className="mt-2">
+                            <h5 className="text-md font-semibold mb-1">
+                              Autre Parcours Diplomant
+                            </h5>
+                            <p className="text-gray-600 mb-1">
+                              <span className="font-medium">Type:</span>{" "}
+                              {student.Parcours.autre_parcours_diplomant.type ||
+                                "N/A"}
+                            </p>
+                            <p className="text-gray-600 mb-1">
+                              <span className="font-medium">
+                                À Partenariat:
+                              </span>{" "}
+                              {student.Parcours.autre_parcours_diplomant
+                                .aPartenariat !== undefined
+                                ? student.Parcours.autre_parcours_diplomant
+                                    .aPartenariat
+                                  ? "Oui"
+                                  : "Non"
+                                : "N/A"}
+                            </p>
+                            <p className="text-gray-600 mb-1">
+                              <span className="font-medium">
+                                Établissement:
+                              </span>{" "}
+                              {student.Parcours.autre_parcours_diplomant
+                                .etablissement || "N/A"}
+                            </p>
+                            <p className="text-gray-600 mb-1">
+                              <span className="font-medium">Durée:</span>{" "}
+                              {student.Parcours.autre_parcours_diplomant
+                                .duree || "N/A"}
+                            </p>
+                            <p className="text-gray-600 mb-1">
+                              <span className="font-medium">Pays:</span>{" "}
+                              {student.Parcours.autre_parcours_diplomant.pays ||
+                                "N/A"}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Stages */}
+                        {student.Parcours.stages &&
+                          student.Parcours.stages.length > 0 && (
+                            <div className="mt-4">
+                              <h5 className="text-md font-semibold mb-2">
+                                Stages
+                              </h5>
+                              {student.Parcours.stages.map(
+                                (stage: Stage, idx: number) => (
+                                  <div key={idx} className="mb-2">
+                                    <p className="text-gray-600 mb-1">
+                                      <span className="font-medium">
+                                        Entreprise:
+                                      </span>{" "}
+                                      {stage.nom_d_entreprise || "N/A"}
+                                    </p>
+                                    <p className="text-gray-600 mb-1">
+                                      <span className="font-medium">
+                                        Année du Stage:
+                                      </span>{" "}
+                                      {stage.annee_du_stage
+                                        ? new Date(
+                                            stage.annee_du_stage
+                                          ).getFullYear()
+                                        : "N/A"}
+                                    </p>
+                                    <p className="text-gray-600 mb-1">
+                                      <span className="font-medium">
+                                        Durée:
+                                      </span>{" "}
+                                      {stage.duree_du_stage || "N/A"}
+                                    </p>
+                                    <p className="text-gray-600 mb-1">
+                                      <span className="font-medium">
+                                        Poste:
+                                      </span>{" "}
+                                      {stage.poste || "N/A"}
+                                    </p>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          )}
+
+                        {/* Diplômes */}
+                        {student.Parcours.diplomes &&
+                          student.Parcours.diplomes.length > 0 && (
+                            <div className="mt-4">
+                              <h5 className="text-md font-semibold mb-2">
+                                Diplômes
+                              </h5>
+                              {student.Parcours.diplomes.map(
+                                (diplome: Diplome, idx: number) => (
+                                  <div key={idx} className="mb-2">
+                                    <p className="text-gray-600 mb-1">
+                                      <span className="font-medium">Nom:</span>{" "}
+                                      {diplome.nom || "N/A"}
+                                    </p>
+                                    <p className="text-gray-600 mb-1">
+                                      <span className="font-medium">
+                                        Année d'Obtention:
+                                      </span>{" "}
+                                      {diplome.annee_d_obtention
+                                        ? new Date(
+                                            diplome.annee_d_obtention
+                                          ).getFullYear()
+                                        : "N/A"}
+                                    </p>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          )}
+
+                        {/* Électifs */}
+                        {student.Parcours.electifs &&
+                          student.Parcours.electifs.length > 0 && (
+                            <div className="mt-4">
+                              <h5 className="text-md font-semibold mb-2">
+                                Électifs
+                              </h5>
+                              {student.Parcours.electifs.map(
+                                (electif: Electif, idx: number) => (
+                                  <div key={idx} className="mb-2">
+                                    <p className="text-gray-600 mb-1">
+                                      <span className="font-medium">Type:</span>{" "}
+                                      {electif.type_electif || "N/A"}
+                                    </p>
+                                    <p className="text-gray-600 mb-1">
+                                      <span className="font-medium">
+                                        Établissement:
+                                      </span>{" "}
+                                      {electif.etablissement_electif || "N/A"}
+                                    </p>
+                                    <p className="text-gray-600 mb-1">
+                                      <span className="font-medium">
+                                        Semestre:
+                                      </span>{" "}
+                                      {electif.semestre_d_electif || "N/A"}
+                                    </p>
+                                  </div>
+                                )
+                              )}
+                            </div>
+                          )}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-center text-gray-500">
+                No student matches the filters.
+              </p>
+            )
+          ) : (
+            <p className="text-center text-gray-500">No results yet.</p>
+          )}
         </div>
       </div>
     </div>
