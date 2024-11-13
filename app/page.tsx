@@ -227,7 +227,7 @@ const StudentQueryForm: React.FC = () => {
                       {student.etablissementOrigine}
                     </p>
                     <p>
-                      <strong>Situation Actuelle:</strong>{" "}
+                      <strong>Type de parcours:</strong>{" "}
                       {student.situationActuelle}
                     </p>
                     {student.defi && (
