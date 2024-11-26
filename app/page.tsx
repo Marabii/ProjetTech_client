@@ -3,7 +3,31 @@ import React, { useState, useEffect, useRef } from "react";
 import type { Etudiant } from "@/interfaces/students";
 
 const StudentQueryForm: React.FC = () => {
-  const [formData, setFormData] = useState<Partial<Etudiant>>({});
+  // Mapping of safe keys to actual field names
+  const fieldMappings: { [key: string]: string } = {
+    identifiantOP: "Identifiant OP",
+    etablissementOrigine: "Etablissement d'origine",
+    filiere: "Filière",
+    nationalite: "Nationalité",
+    nom: "Nom",
+    prenom: "Prénom",
+    // Convention de Stage fields
+    conventionEntiteIdentifiantOP:
+      "CONVENTION DE STAGE.Entité principale - Identifiant OP",
+    conventionDateDebutStage: "CONVENTION DE STAGE.Date de début du stage",
+    conventionDateFinStage: "CONVENTION DE STAGE.Date de fin du stage",
+    conventionFonctionOccupee: "CONVENTION DE STAGE.Stage Fonction occupée",
+    conventionNomStage: "CONVENTION DE STAGE.Nom Stage",
+    // Universite Visitant fields
+    universiteEntiteIdentifiantOP:
+      "UNIVERSITE visitant.Entité principale - Identifiant OP",
+    universiteDateDebutMobilite: "UNIVERSITE visitant.Date de début mobilité",
+    universiteDateFinMobilite: "UNIVERSITE visitant.Date de fin mobilité",
+    universiteTypeMobilite: "UNIVERSITE visitant.Type Mobilité",
+    universiteNomMobilite: "UNIVERSITE visitant.Nom mobilité",
+  };
+
+  const [formData, setFormData] = useState<{ [key: string]: string }>({});
   const [isEmptySearch, setIsEmptySearch] = useState(false);
   const [suggestions, setSuggestions] = useState<{ [key: string]: string[] }>(
     {}
@@ -48,17 +72,38 @@ const StudentQueryForm: React.FC = () => {
   };
 
   const fetchStudents = async (
-    currentFormData: Partial<Etudiant>,
+    currentFormData: { [key: string]: any },
     currentPage: number
   ) => {
     try {
+      // Map formData safe keys to actual field names
+      const query: { [key: string]: any } = {};
+      for (const key in currentFormData) {
+        if (currentFormData[key] !== "") {
+          const actualFieldName = fieldMappings[key];
+          if (actualFieldName) {
+            // Handle nested fields for arrays
+            if (
+              actualFieldName.includes("CONVENTION DE STAGE") ||
+              actualFieldName.includes("UNIVERSITE visitant")
+            ) {
+              const [arrayField, subField] = actualFieldName.split(".");
+              query[arrayField] = query[arrayField] || {};
+              query[arrayField][subField] = currentFormData[key];
+            } else {
+              query[actualFieldName] = currentFormData[key];
+            }
+          }
+        }
+      }
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BACKEND}/api/students/`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            ...currentFormData,
+            ...query,
             page: currentPage,
             limit: 20,
           }),
@@ -84,21 +129,24 @@ const StudentQueryForm: React.FC = () => {
       setHasMore(newStudents.length === 20);
     } catch (error) {
       console.error("Error fetching students:", error);
+      alert("Oops! Error fetching students");
     }
   };
 
-  const fetchSuggestions = async (field: string, query: string = "") => {
+  const fetchSuggestions = async (safeFieldKey: string, query: string = "") => {
     try {
+      const field = encodeURIComponent(fieldMappings[safeFieldKey]);
       const response = await fetch(
         `${
           process.env.NEXT_PUBLIC_BACKEND
         }/api/suggestions?field=${field}&query=${encodeURIComponent(query)}`
       );
       const data = await response.json();
-      setSuggestions((prev) => ({ ...prev, [field]: data.suggestions }));
-      setActiveSuggestionField(field);
+      setSuggestions((prev) => ({ ...prev, [safeFieldKey]: data.suggestions }));
+      setActiveSuggestionField(safeFieldKey);
     } catch (error) {
-      console.error(`Error fetching suggestions for ${field}:`, error);
+      console.error(`Error fetching suggestions for ${safeFieldKey}:`, error);
+      alert("Oops! error getting suggestions");
     }
   };
 
@@ -114,7 +162,7 @@ const StudentQueryForm: React.FC = () => {
     fetchStudents(formData, nextPage);
   };
 
-  const renderInput = (label: string, name: keyof Etudiant) => (
+  const renderInput = (label: string, name: string) => (
     <div className="mb-4 relative">
       <label className="block text-gray-700 mb-2" htmlFor={name}>
         {label}
@@ -155,16 +203,32 @@ const StudentQueryForm: React.FC = () => {
     <div className="max-w-7xl mx-auto p-4" ref={formRef}>
       <form onSubmit={handleSubmit}>
         <h2 className="text-2xl mb-6">Search Students</h2>
-        {renderInput("Établissement Origine", "etablissementOrigine")}
+        {renderInput("Identifiant OP", "identifiantOP")}
+        {renderInput("Etablissement d'origine", "etablissementOrigine")}
         {renderInput("Filière", "filiere")}
-        {renderInput("Matricule Interne", "matriculeInterne")}
         {renderInput("Nationalité", "nationalite")}
         {renderInput("Nom", "nom")}
         {renderInput("Prénom", "prenom")}
-        {renderInput("Situation Actuelle", "situationActuelle")}
-        {renderInput("Défi", "defi")}
-        {renderInput("A", "a")}
-        {renderInput("Majeure", "majeure")}
+        {/* Convention de Stage Fields */}
+        <h3 className="text-xl mt-6 mb-2">Convention de Stage</h3>
+        {renderInput(
+          "Entité principale - Identifiant OP",
+          "conventionEntiteIdentifiantOP"
+        )}
+        {renderInput("Date de début du stage", "conventionDateDebutStage")}
+        {renderInput("Date de fin du stage", "conventionDateFinStage")}
+        {renderInput("Stage Fonction occupée", "conventionFonctionOccupee")}
+        {renderInput("Nom Stage", "conventionNomStage")}
+        {/* Universite Visitant Fields */}
+        <h3 className="text-xl mt-6 mb-2">Université Visitant</h3>
+        {renderInput(
+          "Entité principale - Identifiant OP",
+          "universiteEntiteIdentifiantOP"
+        )}
+        {renderInput("Date de début mobilité", "universiteDateDebutMobilite")}
+        {renderInput("Date de fin mobilité", "universiteDateFinMobilite")}
+        {renderInput("Type Mobilité", "universiteTypeMobilite")}
+        {renderInput("Nom mobilité", "universiteNomMobilite")}
         <div className="w-full flex justify-between">
           <button
             type="submit"
@@ -173,6 +237,7 @@ const StudentQueryForm: React.FC = () => {
             Search
           </button>
           <button
+            type="button"
             className="mt-4 bg-red-500 text-white px-4 py-2 rounded"
             onClick={() => setFormData({})}
           >
@@ -189,10 +254,10 @@ const StudentQueryForm: React.FC = () => {
             {students.map((student, index) => (
               <div key={index} className="p-4 border rounded flex flex-col">
                 <p>
-                  <strong>Nom:</strong> {student.nom}
+                  <strong>Nom:</strong> {student["Nom"]}
                 </p>
                 <p>
-                  <strong>A:</strong> {student.a}
+                  <strong>Prénom:</strong> {student["Prénom"]}
                 </p>
                 <button
                   onClick={() => {
@@ -210,36 +275,73 @@ const StudentQueryForm: React.FC = () => {
                 {student.showMore && (
                   <div className="mt-2">
                     <p>
-                      <strong>Prénom:</strong> {student.prenom}
+                      <strong>Identifiant OP:</strong>{" "}
+                      {student["Identifiant OP"]}
                     </p>
                     <p>
-                      <strong>Matricule Interne:</strong>{" "}
-                      {student.matriculeInterne}
+                      <strong>Nationalité:</strong> {student["Nationalité"]}
                     </p>
                     <p>
-                      <strong>Nationalité:</strong> {student.nationalite}
+                      <strong>Filière:</strong> {student["Filière"]}
                     </p>
                     <p>
-                      <strong>Filière:</strong> {student.filiere}
+                      <strong>Établissement d'origine:</strong>{" "}
+                      {student["Etablissement d'origine"]}
                     </p>
-                    <p>
-                      <strong>Établissement Origine:</strong>{" "}
-                      {student.etablissementOrigine}
-                    </p>
-                    <p>
-                      <strong>Situation Actuelle:</strong>{" "}
-                      {student.situationActuelle}
-                    </p>
-                    {student.defi && (
-                      <p>
-                        <strong>Défi:</strong> {student.defi}
-                      </p>
-                    )}
-                    {student.majeure && (
-                      <p>
-                        <strong>Majeure:</strong> {student.majeure}
-                      </p>
-                    )}
+                    {/* Display Convention de Stage */}
+                    {student["CONVENTION DE STAGE"] &&
+                      student["CONVENTION DE STAGE"].map((convention, idx) => (
+                        <div key={idx} className="mt-2">
+                          <h4 className="font-bold">Convention de Stage:</h4>
+                          <p>
+                            <strong>Entité principale - Identifiant OP:</strong>{" "}
+                            {convention["Entité principale - Identifiant OP"]}
+                          </p>
+                          <p>
+                            <strong>Date de début du stage:</strong>{" "}
+                            {convention["Date de début du stage"]}
+                          </p>
+                          <p>
+                            <strong>Date de fin du stage:</strong>{" "}
+                            {convention["Date de fin du stage"]}
+                          </p>
+                          <p>
+                            <strong>Stage Fonction occupée:</strong>{" "}
+                            {convention["Stage Fonction occupée"]}
+                          </p>
+                          <p>
+                            <strong>Nom Stage:</strong>{" "}
+                            {convention["Nom Stage"]}
+                          </p>
+                        </div>
+                      ))}
+                    {/* Display Universite Visitant */}
+                    {student["UNIVERSITE visitant"] &&
+                      student["UNIVERSITE visitant"].map((universite, idx) => (
+                        <div key={idx} className="mt-2">
+                          <h4 className="font-bold">Université Visitant:</h4>
+                          <p>
+                            <strong>Entité principale - Identifiant OP:</strong>{" "}
+                            {universite["Entité principale - Identifiant OP"]}
+                          </p>
+                          <p>
+                            <strong>Date de début mobilité:</strong>{" "}
+                            {universite["Date de début mobilité"]}
+                          </p>
+                          <p>
+                            <strong>Date de fin mobilité:</strong>{" "}
+                            {universite["Date de fin mobilité"]}
+                          </p>
+                          <p>
+                            <strong>Type Mobilité:</strong>{" "}
+                            {universite["Type Mobilité"]}
+                          </p>
+                          <p>
+                            <strong>Nom mobilité:</strong>{" "}
+                            {universite["Nom mobilité"]}
+                          </p>
+                        </div>
+                      ))}
                   </div>
                 )}
               </div>
