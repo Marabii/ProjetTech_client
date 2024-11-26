@@ -284,10 +284,6 @@ const StudentQueryForm: React.FC = () => {
                     <p>
                       <strong>Filière:</strong> {student["Filière"]}
                     </p>
-                    <p>
-                      <strong>Établissement d'origine:</strong>{" "}
-                      {student["Etablissement d'origine"]}
-                    </p>
                     {/* Display Convention de Stage */}
                     {student["CONVENTION DE STAGE"] &&
                       student["CONVENTION DE STAGE"].map((convention, idx) => (
