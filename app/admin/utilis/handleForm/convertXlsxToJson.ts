@@ -1,5 +1,5 @@
 import * as XLSX from "xlsx";
-import { SheetData } from "./interfaces";
+import { SheetData } from "@/interfaces/form";
 
 /**
  * Converts an XLSX file content to a JSON array while preserving sheet and column names.

@@ -27,6 +27,7 @@ export async function ValidateBdd(file: File): Promise<void> {
       name: "CONVENTION DE STAGE",
       requiredColumns: [
         "Entité principale - Identifiant OP",
+        "Entité liée - Identifiant OP",
         "Entité liée - Date de début du stage",
         "Entité liée - Date de fin du stage",
         "Entité liée - Fonction occupée",

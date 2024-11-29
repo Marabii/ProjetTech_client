@@ -11,8 +11,14 @@ export interface ParseFormDataInterface {
 }
 
 export type ActionReturn = {
-  status: "success" | "failure";
+  status: Status;
+  message?: string;
   errors?: string[];
 } | null;
+
+export enum Status {
+  success = "success",
+  failure = "failure",
+}
 
 export type SheetData = Array<{ [sheetName: string]: any[] }>;

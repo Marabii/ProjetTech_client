@@ -1,12 +1,16 @@
 "use server";
 
-import { ParseFormDataInterface } from "./interfaces";
 import { parseFormData } from "./parseFormData";
-import { ValidateForm } from "./ValidateForm/ValidateForm";
-import { ActionReturn } from "./interfaces";
+import { ValidateForm } from "../ValidateForm/ValidateForm";
 import { convertXlsxToJson } from "./convertXlsxToJson";
 import { revalidatePath } from "next/cache";
 import handleSubmit from "./handleSubmit";
+import parseJson from "@/utils/parseJson";
+import {
+  ActionReturn,
+  ParseFormDataInterface,
+  Status,
+} from "@/interfaces/form";
 
 export async function saveStudentData(
   actionReturn: ActionReturn,
@@ -17,20 +21,27 @@ export async function saveStudentData(
     await ValidateForm(studentsData);
     const dataInJsonFormat = await convertXlsxToJson(studentsData.file);
 
-    await handleSubmit({ data: dataInJsonFormat, type: studentsData.type });
+    const { status, message, errors }: any = await handleSubmit({
+      data: dataInJsonFormat,
+      type: studentsData.type,
+    });
     revalidatePath("/");
-    return { status: "success" };
+    return { status, message, errors };
   } catch (error: unknown) {
     if (error instanceof Error) {
-      console.error("Error:", error);
-      return {
-        status: "failure",
-        errors: [error.message],
-      };
+      const result = parseJson(error.message);
+      if (result.isJson) {
+        return result.value;
+      } else {
+        return {
+          status: Status.failure,
+          errors: [error.message],
+        };
+      }
     } else {
       console.error("An unknown error occurred.");
       return {
-        status: "failure",
+        status: Status.failure,
         errors: ["An unknown error occurred."],
       };
     }

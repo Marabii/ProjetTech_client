@@ -1,15 +1,21 @@
 "use client";
 
-import { useActionState, useEffect } from "react";
-import { ActionReturn } from "./utilis/interfaces";
-import { saveStudentData } from "./utilis/action";
-import SubmitButton from "./SubmitButton";
+import { useActionState, useState } from "react";
+import { ActionReturn } from "@/interfaces/form";
+import { saveStudentData } from "./utilis/handleForm/action";
+import SubmitButton from "../../components/SubmitButton";
 
 export default function AdminPage() {
   const [actionReturn, formAction, pending] = useActionState<
     ActionReturn,
     FormData
   >(saveStudentData, null);
+
+  const [visibleCount, setVisibleCount] = useState(20); // Initial number of errors to show
+
+  const handleShowMore = () => {
+    setVisibleCount((prevCount) => prevCount + 20); // Show 20 more errors
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100 py-6">
@@ -32,6 +38,7 @@ export default function AdminPage() {
               {" "}
               Your student data has been uploaded successfully.
             </span>
+            <span className="block sm:inline">{actionReturn.message}</span>
           </div>
         )}
 
@@ -47,10 +54,20 @@ export default function AdminPage() {
               Please fix the following errors:
             </span>
             <ul className="mt-2 list-disc list-inside text-sm">
-              {actionReturn.errors.map((error, index) => (
-                <li key={index}>{error}</li>
-              ))}
+              {actionReturn.errors
+                .slice(0, visibleCount)
+                .map((error, index) => (
+                  <li key={index}>{error}</li>
+                ))}
             </ul>
+            {visibleCount < actionReturn.errors.length && (
+              <button
+                onClick={handleShowMore}
+                className="mt-2 text-blue-500 hover:underline"
+              >
+                Show more
+              </button>
+            )}
           </div>
         )}
 

@@ -1,4 +1,4 @@
-import { SheetData } from "./interfaces";
+import { ActionReturn, SheetData } from "@/interfaces/form";
 
 export default async function handleSubmit({
   data,
@@ -20,15 +20,11 @@ export default async function handleSubmit({
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(
-        `Request failed with status ${response.status}: ${
-          errorData.message || "Unknown error"
-        }`
-      );
+      const errorData: ActionReturn = await response.json();
+      throw new Error(JSON.stringify(errorData));
     }
 
-    return await response.json(); // Assuming the server responds with JSON
+    return await response.json();
   } catch (error) {
     console.error("Error in handleSubmit:", error);
     throw error; // Re-throwing for the caller to handle

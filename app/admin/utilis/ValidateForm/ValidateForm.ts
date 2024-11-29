@@ -1,4 +1,8 @@
-import { ActionReturn, ParseFormDataInterface } from "../interfaces";
+import {
+  ActionReturn,
+  ParseFormDataInterface,
+  Status,
+} from "@/interfaces/form";
 import { ValidateBdd } from "./ValidateBdd";
 import { ValidateInternships } from "./ValidateInternships";
 
@@ -12,7 +16,7 @@ export async function ValidateForm(
       try {
         await ValidateBdd(file);
         return {
-          status: "success",
+          status: Status.success,
         };
       } catch (e) {
         throw e;
@@ -22,7 +26,7 @@ export async function ValidateForm(
       try {
         await ValidateInternships(file);
         return {
-          status: "success",
+          status: Status.success,
         };
       } catch (e) {
         throw e;
