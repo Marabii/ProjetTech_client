@@ -16,7 +16,6 @@ export default function useOutsideClick<T extends HTMLElement>(
         !ref.current.contains(event.target as Node)
       ) {
         callback();
-        console.log("was clicked");
         setWasClickedInside(false); // User clicked outside after initially clicking inside
       }
     }

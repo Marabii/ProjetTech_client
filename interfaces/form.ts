@@ -10,6 +10,13 @@ export interface ParseFormDataInterface {
   file: File;
 }
 
+export type ActionReturnWithData<T> = {
+  status: Status;
+  data: T;
+  message?: string;
+  errors?: string[];
+} | null;
+
 export type ActionReturn = {
   status: Status;
   message?: string;

@@ -1,0 +1,17 @@
+export const names = [
+  "Identifiant OP",
+  "Etablissement d'origine",
+  "Filière",
+  "Nationalité",
+  "Nom",
+  "Prénom",
+  "Entité principale - Identifiant OP",
+  "Date de début du stage",
+  "Date de fin du stage",
+  "Stage Fonction occupée",
+  "Nom Stage",
+  "Date de début mobilité",
+  "Date de fin mobilité",
+  "Type Mobilité",
+  "Nom mobilité",
+];
