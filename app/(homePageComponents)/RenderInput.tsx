@@ -1,11 +1,30 @@
 "use client";
-import { useState, useCallback } from "react";
-import { fieldMappings } from "./fieldMappings";
+import useOutsideClick from "@/hooks/useOutsideClick";
+import { useState, useCallback, useEffect, useRef } from "react";
 
-const RenderInput = ({ label, name }: { label: string; name: string }) => {
+interface RenderInputProps {
+  name: string;
+  type?: "text" | "date";
+  label?: string;
+  resetTrigger: number; // New prop to trigger reset
+}
+
+const RenderInput: React.FC<RenderInputProps> = ({
+  name,
+  type = "text",
+  label,
+  resetTrigger,
+}) => {
   const [inputValue, setInputValue] = useState("");
   const [isInputActive, setIsInputActive] = useState(false);
   const [suggestions, setSuggestions] = useState<string[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  useOutsideClick(inputRef, () => {
+    setIsInputActive(false);
+    setSuggestions([]);
+  });
 
   const debounce = (func: (...args: any[]) => void, delay: number) => {
     let timer: NodeJS.Timeout;
@@ -24,28 +43,61 @@ const RenderInput = ({ label, name }: { label: string; name: string }) => {
     []
   );
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setInputValue(e.target.value);
-    debouncedFetchSuggestions(name, e.target.value);
+  const validateDate = (value: string): boolean => {
+    const dateRegex =
+      /^(?:(?:19|20)\d\d)-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$/;
+    return dateRegex.test(value);
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    setInputValue(value);
+
+    if (type === "date") {
+      // Validate the date input
+      if (!validateDate(value)) {
+        setError("Date must be in YYYY-MM-DD format.");
+      } else {
+        setError(null);
+      }
+    } else {
+      debouncedFetchSuggestions(name, value);
+    }
+  };
+
+  const handleInputFocus = () => {
+    if (type !== "date") {
+      fetchSuggestions(name, "", setIsInputActive, setSuggestions);
+    }
+  };
+
+  // Effect to reset input when resetTrigger changes
+  useEffect(() => {
+    setInputValue("");
+    setError(null);
+    setSuggestions([]);
+    setIsInputActive(false);
+  }, [resetTrigger]);
+
   return (
-    <div className="mb-4 relative">
+    <div ref={inputRef} className="mb-4 relative">
       <label className="block text-gray-700 mb-2" htmlFor={name}>
-        {label}
+        {label || name}
       </label>
       <input
-        type="text"
+        type={"text"}
         name={name}
         id={name}
         value={inputValue}
         onChange={handleInputChange}
-        onFocus={() =>
-          fetchSuggestions(name, "", setIsInputActive, setSuggestions)
-        }
-        className="w-full px-3 py-2 border rounded"
+        onFocus={handleInputFocus}
+        className={`w-full px-3 py-2 border rounded ${
+          error ? "border-red-500" : "border-gray-300"
+        } focus:outline-none focus:ring-2 focus:ring-blue-500`}
         autoComplete="off"
       />
+      {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       {isInputActive && suggestions && suggestions.length > 0 && (
         <div className="absolute bg-white border w-full mt-1 max-h-40 overflow-y-auto z-10 transition-opacity duration-300">
           {suggestions.map((suggestion, index) => (
@@ -68,14 +120,14 @@ const RenderInput = ({ label, name }: { label: string; name: string }) => {
 };
 
 async function fetchSuggestions(
-  safeFieldKey: string,
+  inputName: string,
   query: string = "",
   setIsInputActive: (state: boolean) => void,
   setSuggestions: (suggestions: string[]) => void
 ) {
   try {
     setIsInputActive(true);
-    const field = encodeURIComponent(fieldMappings[safeFieldKey]);
+    const field = encodeURIComponent(inputName);
     const response = await fetch(
       `${
         process.env.NEXT_PUBLIC_BACKEND
@@ -84,8 +136,8 @@ async function fetchSuggestions(
     const data = await response.json();
     setSuggestions(data.suggestions);
   } catch (error) {
-    console.error(`Error fetching suggestions for ${safeFieldKey}:`, error);
-    alert("Oops! error getting suggestions");
+    console.error(`Error fetching suggestions for ${inputName}:`, error);
+    alert("Oops! Error getting suggestions.");
   }
 }
 

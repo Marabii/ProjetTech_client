@@ -1,9 +1,8 @@
 "use server";
 
 import { parseFormData } from "./parseFormData";
-import { ValidateForm } from "../ValidateForm/ValidateForm";
+import { ValidateForm } from "../formValidator/ValidateForm";
 import { convertXlsxToJson } from "./convertXlsxToJson";
-import { revalidatePath } from "next/cache";
 import handleSubmit from "./handleSubmit";
 import parseJson from "@/utils/parseJson";
 import {
@@ -21,23 +20,18 @@ export async function saveStudentData(
     await ValidateForm(studentsData);
     const dataInJsonFormat = await convertXlsxToJson(studentsData.file);
 
-    const { status, message, errors }: any = await handleSubmit({
+    const result = await handleSubmit({
       data: dataInJsonFormat,
       type: studentsData.type,
     });
-    revalidatePath("/");
-    return { status, message, errors };
+    return result;
   } catch (error: unknown) {
     if (error instanceof Error) {
-      const result = parseJson(error.message);
-      if (result.isJson) {
-        return result.value;
-      } else {
-        return {
-          status: Status.failure,
-          errors: [error.message],
-        };
-      }
+      console.error("Error:", error);
+      return {
+        status: Status.failure,
+        errors: [error.message],
+      };
     } else {
       console.error("An unknown error occurred.");
       return {

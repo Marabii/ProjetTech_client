@@ -1,6 +1,12 @@
-export default function SubmitButton({ pending }: { pending: boolean }) {
+interface ISubmitBtn {
+  pending: boolean;
+  callback?: () => void;
+}
+
+export default function SubmitButton({ pending, callback }: ISubmitBtn) {
   return (
     <button
+      onClick={callback}
       type="submit"
       className={`flex items-center justify-center bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded ${
         pending ? "opacity-50 cursor-not-allowed" : ""

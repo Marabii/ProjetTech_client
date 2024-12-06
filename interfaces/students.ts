@@ -1,26 +1,37 @@
 export interface Etudiant {
   "Identifiant OP": string;
-  "Etablissement d'origine": string;
-  Filière: string;
-  Nationalité: string;
-  Nom: string;
-  Prénom: string;
-  "CONVENTION DE STAGE"?: ConventionDeStage[]; // Optional array
-  "UNIVERSITE visitant"?: UniversiteVisitant[]; // Optional array
+  "Etablissement d'origine"?: string;
+  Filière?: string;
+  Nationalité?: string;
+  Nom?: string;
+  Prénom?: string;
+  "CONVENTION DE STAGE"?: ConventionDeStage[];
+  "UNIVERSITE visitant"?: UniversiteVisitant[];
+  DéfiEtMajeure?: DéfiEtMajeure;
 }
 
 export interface ConventionDeStage {
-  "Entité principale - Identifiant OP": string; // Retained for reference
+  "Entité principale - Identifiant OP": string;
   "Date de début du stage": string;
   "Date de fin du stage": string;
-  "Stage Fonction occupée": string; // Renamed from "Entité liée - Fonction occupée"
-  "Nom Stage": string; // Renamed from "Entité liée - Nom"
+  "Stage Fonction occupée": string;
+  "Nom Stage": string;
 }
 
 export interface UniversiteVisitant {
-  "Entité principale - Identifiant OP": string; // Retained for reference
-  "Date de début mobilité": string; // Renamed from "Date de début"
-  "Date de fin mobilité": string; // Renamed from "Date de fin"
+  "Entité principale - Identifiant OP": string;
+  "Date de début mobilité": string;
+  "Date de fin mobilité": string;
   "Type Mobilité": string;
-  "Nom mobilité": string; // Renamed from "Entité liée - Nom"
+  "Nom mobilité": string;
+}
+
+export interface Majeure {
+  nom: string;
+  promo: string;
+}
+
+export interface DéfiEtMajeure {
+  défi: string;
+  majeures: Majeure[];
 }

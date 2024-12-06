@@ -1,8 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { ActionReturn } from "@/interfaces/form";
-import { saveStudentData } from "./utilis/handleForm/action";
+import { ActionReturn, Status } from "@/interfaces/form";
+import { saveStudentData } from "./formHandler/action";
 import SubmitButton from "../../components/SubmitButton";
 
 export default function AdminPage() {
@@ -28,49 +28,54 @@ export default function AdminPage() {
         </h1>
 
         {/* Success Message Section */}
-        {actionReturn?.status === "success" && (
+        {actionReturn?.status === Status.success && (
           <div
             className="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative"
             role="alert"
           >
-            <strong className="font-bold">Success!</strong>
+            <strong className="font-bold">Processing complete!</strong>
             <span className="block sm:inline">
               {" "}
               Your student data has been uploaded successfully.
             </span>
-            <span className="block sm:inline">{actionReturn.message}</span>
-          </div>
-        )}
-
-        {/* Error Display Section */}
-        {actionReturn?.status === "failure" && actionReturn.errors && (
-          <div
-            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
-            role="alert"
-          >
-            <strong className="font-bold">Submission Failed!</strong>
-            <span className="block sm:inline">
-              {" "}
-              Please fix the following errors:
-            </span>
-            <ul className="mt-2 list-disc list-inside text-sm">
-              {actionReturn.errors
-                .slice(0, visibleCount)
-                .map((error, index) => (
-                  <li key={index}>{error}</li>
-                ))}
-            </ul>
-            {visibleCount < actionReturn.errors.length && (
-              <button
-                onClick={handleShowMore}
-                className="mt-2 text-blue-500 hover:underline"
-              >
-                Show more
-              </button>
+            {actionReturn.message && (
+              <span className="block sm:inline">{actionReturn.message}</span>
             )}
           </div>
         )}
 
+        {/* Error Display Section */}
+        {actionReturn?.status === Status.failure &&
+          actionReturn.errors?.length &&
+          actionReturn.errors?.length > 0 && (
+            <div
+              className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative"
+              role="alert"
+            >
+              <strong className="font-bold">Submission Failed!</strong>
+              <span className="block sm:inline">
+                {actionReturn.message || "We encountered some errors"}
+              </span>
+              <ul className="mt-2 list-disc list-inside text-sm">
+                {actionReturn.errors
+                  .slice(0, visibleCount)
+                  .map((error, index) => (
+                    <li key={index}>{error}</li>
+                  ))}
+              </ul>
+              {visibleCount < actionReturn.errors.length && (
+                <button
+                  type="button"
+                  onClick={handleShowMore}
+                  className="mt-2 text-blue-500 hover:underline"
+                >
+                  Show more
+                </button>
+              )}
+            </div>
+          )}
+
+        {/* Input Fields */}
         <div className="mb-4">
           <label
             htmlFor="type"
@@ -87,7 +92,7 @@ export default function AdminPage() {
             <option value="bdd">bdd</option>
             <option value="defis">defis</option>
             <option value="stages">stages</option>
-            <option value="majeures">majeures</option>
+            <option value="majeure">majeure</option>
           </select>
         </div>
 

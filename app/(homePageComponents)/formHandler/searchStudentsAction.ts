@@ -2,7 +2,7 @@
 
 import { ActionReturnWithData, Status } from "@/interfaces/form";
 import { Etudiant } from "@/interfaces/students";
-import { names } from "@/app/(homePageComponents)/formHandler/InputFields";
+import { searchFields } from "@/app/(homePageComponents)/formHandler/searchFields";
 import { fetchStudents } from "./fetchStudents";
 
 export async function searchStudentsAction(
@@ -10,12 +10,15 @@ export async function searchStudentsAction(
   formData: FormData
 ): Promise<ActionReturnWithData<Etudiant[]>> {
   const parsedFormData: { [key: string]: FormDataEntryValue } = {};
-  names.forEach((inputName) => {
-    const fieldValue = formData.get(inputName);
-    if (fieldValue) {
-      parsedFormData[inputName] = fieldValue;
-    }
-  });
+
+  for (const [_, category] of Object.entries(searchFields)) {
+    category.forEach((input) => {
+      const fieldValue = formData.get(input.name);
+      if (fieldValue) {
+        parsedFormData[input.name] = fieldValue;
+      }
+    });
+  }
 
   const currPage: number = parseInt(
     formData.get("currPage")?.toString() || "1"

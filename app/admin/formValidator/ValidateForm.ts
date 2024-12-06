@@ -5,6 +5,8 @@ import {
 } from "@/interfaces/form";
 import { ValidateBdd } from "./ValidateBdd";
 import { ValidateInternships } from "./ValidateInternships";
+import { ValidateDefis } from "./ValidateDefis";
+import { ValidateMajeure } from "./ValidateMajeure";
 
 export async function ValidateForm(
   data: ParseFormDataInterface
@@ -25,6 +27,26 @@ export async function ValidateForm(
     case "stages":
       try {
         await ValidateInternships(file);
+        return {
+          status: Status.success,
+        };
+      } catch (e) {
+        throw e;
+      }
+
+    case "defis":
+      try {
+        await ValidateDefis(file);
+        return {
+          status: Status.success,
+        };
+      } catch (e) {
+        throw e;
+      }
+
+    case "majeure":
+      try {
+        await ValidateMajeure(file);
         return {
           status: Status.success,
         };

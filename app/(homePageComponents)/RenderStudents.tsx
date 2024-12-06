@@ -1,3 +1,5 @@
+// components/RenderStudents.tsx
+
 "use client";
 
 import { useState, memo } from "react";
@@ -7,6 +9,7 @@ import {
   ConventionDeStage,
   UniversiteVisitant,
 } from "@/interfaces/students";
+import DéfiEtMajeureCard from "./DéfiEtMajeureCard";
 
 interface RenderStudentsProps {
   students: Etudiant[];
@@ -29,9 +32,9 @@ const RenderStudents: React.FC<RenderStudentsProps> = ({ students }) => {
         Search Results
       </h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {students.map((student) => (
+        {students.map((student, index) => (
           <StudentCard
-            key={student["Identifiant OP"]}
+            key={index}
             student={student}
             onShowMore={() => handleShowMore(student)}
           />
@@ -97,6 +100,16 @@ const RenderStudents: React.FC<RenderStudentsProps> = ({ students }) => {
                       )}
                     </div>
                   )}
+
+                {/* Display DéfiEtMajeure */}
+                {selectedStudent.DéfiEtMajeure && (
+                  <div className="mt-4">
+                    <h3 className="text-xl font-semibold">Défi et Majeure:</h3>
+                    <DéfiEtMajeureCard
+                      defiEtMajeure={selectedStudent.DéfiEtMajeure}
+                    />
+                  </div>
+                )}
               </div>
             </div>
           </Modal>
@@ -124,6 +137,7 @@ const StudentCard: React.FC<StudentCardProps> = memo(
           </p>
         </div>
         <button
+          type="button"
           onClick={onShowMore}
           className="mt-4 text-indigo-600 hover:text-indigo-800 font-medium flex items-center group"
         >
@@ -162,11 +176,11 @@ const ConventionStageCard: React.FC<ConventionStageCardProps> = memo(
         </p>
         <p>
           <strong>Date de début du stage:</strong>{" "}
-          {convention["Date de début du stage"]}
+          {new Date(convention["Date de début du stage"]).toLocaleDateString()}
         </p>
         <p>
           <strong>Date de fin du stage:</strong>{" "}
-          {convention["Date de fin du stage"]}
+          {new Date(convention["Date de fin du stage"]).toLocaleDateString()}
         </p>
         <p>
           <strong>Stage Fonction occupée:</strong>{" "}
@@ -194,11 +208,11 @@ const UniversiteVisitantCard: React.FC<UniversiteVisitantCardProps> = memo(
         </p>
         <p>
           <strong>Date de début mobilité:</strong>{" "}
-          {universite["Date de début mobilité"]}
+          {new Date(universite["Date de début mobilité"]).toLocaleDateString()}
         </p>
         <p>
           <strong>Date de fin mobilité:</strong>{" "}
-          {universite["Date de fin mobilité"]}
+          {new Date(universite["Date de fin mobilité"]).toLocaleDateString()}
         </p>
         <p>
           <strong>Type Mobilité:</strong> {universite["Type Mobilité"]}
@@ -234,6 +248,7 @@ function Modal({ onClose, children }: ModalProps) {
         onClick={(e: React.MouseEvent<HTMLElement>) => e.stopPropagation()} // Prevent closing when clicking inside the modal
       >
         <button
+          type="button"
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 focus:outline-none"
         >

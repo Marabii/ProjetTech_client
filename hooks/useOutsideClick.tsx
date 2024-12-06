@@ -1,9 +1,10 @@
 import { useEffect, useState, RefObject } from "react";
 
-export default function useOutsideClick<T extends HTMLElement>(
+export default function useOutsideClick<T extends HTMLElement | null>(
   ref: RefObject<T>,
   callback: () => void
 ): void {
+  if (ref === null) return;
   const [wasClickedInside, setWasClickedInside] = useState(false);
 
   useEffect(() => {

@@ -6,7 +6,7 @@ export default async function handleSubmit({
 }: {
   data: SheetData;
   type: string;
-}) {
+}): Promise<ActionReturn> {
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND}/api/server/postStudentData?type=${type}`,

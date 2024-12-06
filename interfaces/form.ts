@@ -2,7 +2,7 @@ export enum Type {
   bdd = "bdd",
   defis = "defis",
   stages = "stages",
-  majeures = "majeures",
+  majeure = "majeure",
 }
 
 export interface ParseFormDataInterface {
