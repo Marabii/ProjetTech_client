@@ -8,8 +8,6 @@ export async function fetchStudents(
 ): Promise<ActionReturnWithData<Etudiant[]>> {
   try {
     const query = queryProcessor(parsedFormData);
-    console.log("query: ", query);
-
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BACKEND}/api/students/`,
       {
