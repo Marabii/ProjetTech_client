@@ -1,11 +1,10 @@
-import { ActionReturnWithData } from "@/interfaces/form";
-import { Etudiant } from "@/interfaces/students";
+import { ActionReturnWithData, SearchResult } from "@/interfaces/form";
 import { queryProcessor } from "./queryProcessor";
 
 export async function fetchStudents(
-  parsedFormData: { [key: string]: any },
+  parsedFormData: { [key: string]: unknown },
   currentPage: number
-): Promise<ActionReturnWithData<Etudiant[]>> {
+): Promise<ActionReturnWithData<SearchResult>> {
   try {
     const query = queryProcessor(parsedFormData);
     const response = await fetch(
@@ -20,7 +19,8 @@ export async function fetchStudents(
         }),
       }
     );
-    const apiResponse: ActionReturnWithData<Etudiant[]> = await response.json();
+    const apiResponse: ActionReturnWithData<SearchResult> =
+      await response.json();
     return apiResponse;
   } catch (error) {
     throw error;

@@ -1,16 +1,16 @@
 "use server";
 
-import { ActionReturnWithData, Status } from "@/interfaces/form";
-import { Etudiant } from "@/interfaces/students";
+import { ActionReturnWithData, SearchResult, Status } from "@/interfaces/form";
 import { searchFields } from "@/app/(homePageComponents)/formHandler/searchFields";
 import { fetchStudents } from "./fetchStudents";
 
 export async function searchStudentsAction(
-  actionReturn: ActionReturnWithData<Etudiant[]>,
+  actionReturn: ActionReturnWithData<SearchResult>,
   formData: FormData
-): Promise<ActionReturnWithData<Etudiant[]>> {
+): Promise<ActionReturnWithData<SearchResult>> {
   const parsedFormData: { [key: string]: FormDataEntryValue } = {};
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [_, category] of Object.entries(searchFields)) {
     category.forEach((input) => {
       const fieldValue = formData.get(input.name);
@@ -33,14 +33,14 @@ export async function searchStudentsAction(
       return {
         status: Status.failure,
         errors: [error.message],
-        data: {} as Etudiant[],
+        data: {} as SearchResult,
       };
     } else {
       console.error("An unknown error occurred.");
       return {
         status: Status.failure,
         errors: ["An unknown error occurred."],
-        data: {} as Etudiant[],
+        data: {} as SearchResult,
       };
     }
   }

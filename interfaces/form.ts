@@ -1,3 +1,5 @@
+import { Etudiant } from "./students";
+
 export enum Type {
   bdd = "bdd",
   defis = "defis",
@@ -28,4 +30,9 @@ export enum Status {
   failure = "failure",
 }
 
-export type SheetData = Array<{ [sheetName: string]: any[] }>;
+export type SheetData = Array<{ [sheetName: string]: unknown[] }>;
+
+export type SearchResult = {
+  students: Etudiant[];
+  totalCount: number;
+};
