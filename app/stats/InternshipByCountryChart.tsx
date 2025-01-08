@@ -46,7 +46,7 @@ const InternshipByCountryChart: React.FC = () => {
 
   return (
     <div className="p-4 bg-white rounded shadow">
-      <h2 className="text-xl font-bold mb-2">Internships by Country</h2>
+      <h2 className="text-xl font-bold mb-2">Stages par pays</h2>
       <Doughnut data={chartData} />
     </div>
   );

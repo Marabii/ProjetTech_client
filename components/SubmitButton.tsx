@@ -1,9 +1,16 @@
 interface ISubmitBtn {
   pending: boolean;
   callback?: () => void;
+  text?: string;
+  pendingText?: string;
 }
 
-export default function SubmitButton({ pending, callback }: ISubmitBtn) {
+export default function SubmitButton({
+  pending,
+  callback,
+  text,
+  pendingText,
+}: ISubmitBtn) {
   return (
     <button
       onClick={callback}
@@ -35,7 +42,9 @@ export default function SubmitButton({ pending, callback }: ISubmitBtn) {
           ></path>
         </svg>
       )}
-      {pending ? "Sending..." : "Send Data"}
+      {pending
+        ? pendingText || "En train de rechercher..."
+        : text || "Chercher"}
     </button>
   );
 }

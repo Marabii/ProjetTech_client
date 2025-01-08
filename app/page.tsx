@@ -61,9 +61,7 @@ const StudentQueryForm: React.FC = () => {
       variants={containerVariants}
       transition={{ duration: 0.5, ease: "easeOut" }}
     >
-      <h2 className="text-3xl font-semibold mb-6 text-gray-800">
-        Student Search
-      </h2>
+      <h2 className="text-3xl font-semibold mb-6 text-gray-800">Rechercher</h2>
 
       {/* Common Search Fields */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -96,7 +94,9 @@ const StudentQueryForm: React.FC = () => {
           variants={containerVariants}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          {showAdvanced ? "Hide Advanced Search" : "Show Advanced Search"}
+          {showAdvanced
+            ? "Masquer la recherche avancée"
+            : "Afficher la recherche avancée"}
         </motion.button>
 
         <motion.button
@@ -108,7 +108,7 @@ const StudentQueryForm: React.FC = () => {
           variants={containerVariants}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          Reset Input Fields
+          Réinitialiser les champs de saisie
         </motion.button>
       </div>
 

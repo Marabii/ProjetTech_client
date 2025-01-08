@@ -28,7 +28,7 @@ const TotalStudentsChart: React.FC = () => {
 
   return (
     <div className="p-4 bg-white rounded shadow">
-      <h2 className="text-xl font-bold mb-2">Total Students</h2>
+      <h2 className="text-xl font-bold mb-2">Nombre total d&apos;étudiants</h2>
       <p className="text-4xl font-semibold text-center">{data.count}</p>
     </div>
   );

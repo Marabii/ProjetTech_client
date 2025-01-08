@@ -30,13 +30,15 @@ export default function RootLayout({
         {/* Header */}
         <header className="bg-white shadow-md py-4">
           <div className="container mx-auto flex justify-between items-center px-6">
-            <h1 className="text-2xl font-bold">Projet Tech</h1>
+            <Link href="/">
+              <h1 className="text-2xl font-bold">Projet Tech</h1>
+            </Link>
             <nav className="flex space-x-4">
               <Link
-                href="/"
+                href="/stats"
                 className="text-lg  text-gray-700 hover:text-blue-500"
               >
-                Home
+                Statistiques
               </Link>
               <Link
                 href="/admin"

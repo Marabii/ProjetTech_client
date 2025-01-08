@@ -54,7 +54,7 @@ const NationalityDistributionChart: React.FC = () => {
 
   return (
     <div className="p-4 bg-white rounded shadow">
-      <h2 className="text-xl font-bold mb-2">Nationality Distribution</h2>
+      <h2 className="text-xl font-bold mb-2">Répartition des nationalités</h2>
       <Pie data={chartData} />
     </div>
   );
