@@ -78,12 +78,14 @@ export async function ValidateBdd(file: File): Promise<void> {
     }
 
     // Convert the first row to get headers
-    const sheetJson: any[][] = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+    const sheetJson: unknown[][] = XLSX.utils.sheet_to_json(sheet, {
+      header: 1,
+    });
     if (sheetJson.length === 0) {
       throw new Error(`Sheet "${name}" is empty.`);
     }
 
-    const headers: string[] = sheetJson[0].map((header: any) =>
+    const headers: string[] = sheetJson[0].map((header: unknown) =>
       String(header).trim()
     );
 
@@ -96,7 +98,4 @@ export async function ValidateBdd(file: File): Promise<void> {
       }
     }
   }
-
-  // If all validations pass
-  console.log("XLSX file is valid.");
 }

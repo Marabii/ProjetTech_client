@@ -9,6 +9,7 @@ import { ActionReturnWithData, SearchResult } from "@/interfaces/form";
 import SubmitButton from "@/components/SubmitButton";
 import RenderInput from "./(homePageComponents)/RenderInput";
 import { motion, AnimatePresence } from "framer-motion";
+import CustomSelect from "@/components/CustomSelect";
 
 const StudentQueryForm: React.FC = () => {
   const [wasSubmitted, setWasSubmitted] = useState(false);
@@ -25,6 +26,13 @@ const StudentQueryForm: React.FC = () => {
   const studentsPerPage = 20;
   const totalPages = Math.ceil(totalCount / studentsPerPage);
 
+  const sortingOptions = [
+    { label: "Ordre croissant de l'année de diplomation", value: "increasing" },
+    {
+      label: "Ordre décroissant de l'année de diplomation",
+      value: "decreasing",
+    },
+  ];
   const isEmptySearch = students.length === 0 && wasSubmitted && !pending;
 
   useEffect(() => {
@@ -190,7 +198,7 @@ const StudentQueryForm: React.FC = () => {
       </AnimatePresence>
 
       {/* Submit Button */}
-      <div className="w-full flex justify-center mt-6">
+      <div className="w-full flex justify-between mt-6">
         <SubmitButton
           pending={pending}
           callback={() => {
@@ -198,6 +206,13 @@ const StudentQueryForm: React.FC = () => {
             setWasSubmitted(true);
             setCurrPage(1);
           }}
+        />
+
+        <CustomSelect
+          options={sortingOptions}
+          name="sortingOrder"
+          placeholder="Sélectionnez l'ordre de Tri"
+          defaultValue="decreasing"
         />
       </div>
 

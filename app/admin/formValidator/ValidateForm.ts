@@ -11,7 +11,11 @@ import { ValidateMajeure } from "./ValidateMajeure";
 export async function ValidateForm(
   data: ParseFormDataInterface
 ): Promise<ActionReturn> {
-  const { type, file } = data;
+  const { type, file, graduationYear } = data;
+
+  if (type === "bdd" && !graduationYear) {
+    throw new Error("Année de diplomation est manquante");
+  }
 
   switch (type) {
     case "bdd":

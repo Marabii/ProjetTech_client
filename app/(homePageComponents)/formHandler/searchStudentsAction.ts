@@ -24,8 +24,11 @@ export async function searchStudentsAction(
     formData.get("currPage")?.toString() || "1"
   );
 
+  const sortingOrder: string =
+    formData.get("sortingOrder")?.toString() || "decreasing";
+
   try {
-    const result = await fetchStudents(parsedFormData, currPage);
+    const result = await fetchStudents(parsedFormData, currPage, sortingOrder);
     return result;
   } catch (error: unknown) {
     if (error instanceof Error) {

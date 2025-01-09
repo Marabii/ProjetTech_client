@@ -3,9 +3,9 @@
 export const searchFields = {
   commonSearch: [
     {
-      name: "Identifiant OP",
+      name: "ANNÉE DE DIPLOMATION",
       type: "text",
-      label: "Identifiant unique de l'étudiant",
+      label: "Année de diplomation de l'étudiant",
     },
     { name: "Nom", type: "text", label: "Nom de l'étudiant" },
     { name: "Prénom", type: "text", label: "Prénom de l'étudiant" },
@@ -22,7 +22,11 @@ export const searchFields = {
     },
   ],
   advancedSearch: [
-    // Fields from "CONVENTION DE STAGE"
+    {
+      name: "Identifiant OP",
+      type: "text",
+      label: "Identifiant unique de l'étudiant",
+    },
     {
       name: "CONVENTION DE STAGE.Entité liée - Identifiant OP",
       type: "text",

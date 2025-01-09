@@ -3,13 +3,15 @@ import { ActionReturn, SheetData } from "@/interfaces/form";
 export default async function handleSubmit({
   data,
   type,
+  graduationYear,
 }: {
   data: SheetData;
   type: string;
+  graduationYear: number;
 }): Promise<ActionReturn> {
   try {
     const response = await fetch(
-      `${process.env.NEXT_PUBLIC_BACKEND}/api/server/postStudentData?type=${type}`,
+      `${process.env.NEXT_PUBLIC_BACKEND}/api/server/postStudentData?type=${type}&graduationYearQuery=${graduationYear}`,
       {
         method: "POST",
         headers: {

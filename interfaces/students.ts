@@ -1,12 +1,14 @@
 export interface Etudiant {
   "Identifiant OP": string;
   "Etablissement d'origine"?: string;
+  "ANNÉE DE DIPLOMATION": number;
   Filière?: string;
   Nationalité?: string;
   Nom?: string;
   Prénom?: string;
   "CONVENTION DE STAGE"?: ConventionDeStage[];
   "UNIVERSITE visitant"?: UniversiteVisitant[];
+
   DéfiEtMajeure?: DéfiEtMajeure;
 }
 
@@ -16,6 +18,12 @@ export interface ConventionDeStage {
   "Date de fin du stage": string;
   "Stage Fonction occupée": string;
   "Nom Stage": string;
+  "Indemnités du stage"?: string;
+  Durée?: string;
+  "Code SIRET"?: string;
+  Pays?: string;
+  Ville?: string;
+  "Ville (Hors France)"?: string;
 }
 
 export interface UniversiteVisitant {

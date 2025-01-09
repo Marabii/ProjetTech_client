@@ -10,6 +10,7 @@ export enum Type {
 export interface ParseFormDataInterface {
   type: Type;
   file: File;
+  graduationYear: number;
 }
 
 export type ActionReturnWithData<T> = {
@@ -36,3 +37,17 @@ export type SearchResult = {
   students: Etudiant[];
   totalCount: number;
 };
+
+export interface SelectOption {
+  label: string;
+  value: string;
+}
+
+export interface CustomSelectProps {
+  options: SelectOption[];
+  value?: string;
+  onChange?: (value: string) => void;
+  placeholder: string;
+  name: string;
+  defaultValue?: string;
+}

@@ -4,7 +4,6 @@ import { parseFormData } from "./parseFormData";
 import { ValidateForm } from "../formValidator/ValidateForm";
 import { convertXlsxToJson } from "./convertXlsxToJson";
 import handleSubmit from "./handleSubmit";
-import parseJson from "@/utils/parseJson";
 import {
   ActionReturn,
   ParseFormDataInterface,
@@ -23,6 +22,7 @@ export async function saveStudentData(
     const result = await handleSubmit({
       data: dataInJsonFormat,
       type: studentsData.type,
+      graduationYear: studentsData.graduationYear,
     });
     return result;
   } catch (error: unknown) {

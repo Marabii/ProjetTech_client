@@ -55,6 +55,10 @@ const RenderStudents: React.FC<RenderStudentsProps> = ({ students }) => {
                   {selectedStudent["Identifiant OP"]}
                 </p>
                 <p>
+                  <strong>Année de diplomation:</strong>{" "}
+                  {selectedStudent["ANNÉE DE DIPLOMATION"]}
+                </p>
+                <p>
                   <strong>Nationalité:</strong> {selectedStudent.Nationalité}
                 </p>
                 <p>
@@ -134,6 +138,10 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onShowMore }) => {
         <p className="text-lg">
           <strong>Prénom:</strong> {student.Prénom}
         </p>
+        <p className="text-lg">
+          <strong>Année de diplomation:</strong>{" "}
+          {student["ANNÉE DE DIPLOMATION"]}
+        </p>
       </div>
       <button
         type="button"
@@ -184,6 +192,12 @@ const ConventionStageCard: React.FC<ConventionStageCardProps> = ({
       <p>
         <strong>Stage Fonction occupée:</strong>{" "}
         {convention["Stage Fonction occupée"]}
+      </p>
+      <p>
+        <strong>Pays où se déroule le stage</strong>{" "}
+        {convention.Pays?.toLowerCase() === "israel"
+          ? "unknown country, FREE PALESTINE"
+          : convention.Pays}
       </p>
       <p>
         <strong>Nom Stage:</strong> {convention["Nom Stage"]}
