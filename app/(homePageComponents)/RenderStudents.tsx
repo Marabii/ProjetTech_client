@@ -10,6 +10,7 @@ import {
   UniversiteVisitant,
 } from "@/interfaces/students";
 import DéfiEtMajeureCard from "./DéfiEtMajeureCard";
+import { formatDate } from "@/utils/formatDate";
 
 interface RenderStudentsProps {
   students: Etudiant[];
@@ -50,24 +51,35 @@ const RenderStudents: React.FC<RenderStudentsProps> = ({ students }) => {
                 {selectedStudent.Nom} {selectedStudent.Prénom}
               </h2>
               <div className="space-y-2">
-                <p>
-                  <strong>Identifiant OP:</strong>{" "}
-                  {selectedStudent["Identifiant OP"]}
-                </p>
-                <p>
-                  <strong>Année de diplomation:</strong>{" "}
-                  {selectedStudent["ANNÉE DE DIPLOMATION"]}
-                </p>
-                <p>
-                  <strong>Nationalité:</strong> {selectedStudent.Nationalité}
-                </p>
-                <p>
-                  <strong>Filière:</strong> {selectedStudent.Filière}
-                </p>
-                <p>
-                  <strong>Établissement d&apos;origine:</strong>{" "}
-                  {selectedStudent["Etablissement d'origine"]}
-                </p>
+                {/* Conditionally render fields if they are not null or undefined */}
+                {selectedStudent["Identifiant OP"] && (
+                  <p>
+                    <strong>Identifiant OP:</strong>{" "}
+                    {selectedStudent["Identifiant OP"]}
+                  </p>
+                )}
+                {selectedStudent["ANNÉE DE DIPLOMATION"] && (
+                  <p>
+                    <strong>Année de diplomation:</strong>{" "}
+                    {selectedStudent["ANNÉE DE DIPLOMATION"]}
+                  </p>
+                )}
+                {selectedStudent.Nationalité && (
+                  <p>
+                    <strong>Nationalité:</strong> {selectedStudent.Nationalité}
+                  </p>
+                )}
+                {selectedStudent.Filière && (
+                  <p>
+                    <strong>Filière:</strong> {selectedStudent.Filière}
+                  </p>
+                )}
+                {selectedStudent["Etablissement d'origine"] && (
+                  <p>
+                    <strong>Établissement d&apos;origine:</strong>{" "}
+                    {selectedStudent["Etablissement d'origine"]}
+                  </p>
+                )}
 
                 {/* Display Convention de Stage */}
                 {selectedStudent["CONVENTION DE STAGE"] &&
@@ -138,10 +150,12 @@ const StudentCard: React.FC<StudentCardProps> = ({ student, onShowMore }) => {
         <p className="text-lg">
           <strong>Prénom:</strong> {student.Prénom}
         </p>
-        <p className="text-lg">
-          <strong>Année de diplomation:</strong>{" "}
-          {student["ANNÉE DE DIPLOMATION"]}
-        </p>
+        {student["ANNÉE DE DIPLOMATION"] && (
+          <p className="text-lg">
+            <strong>Année de diplomation:</strong>{" "}
+            {student["ANNÉE DE DIPLOMATION"]}
+          </p>
+        )}
       </div>
       <button
         type="button"
@@ -175,33 +189,54 @@ interface ConventionStageCardProps {
 const ConventionStageCard: React.FC<ConventionStageCardProps> = ({
   convention,
 }) => {
+  // Format dates using the utility function
+  const formattedStartDate = formatDate(convention["Date de début du stage"]);
+  const formattedEndDate = formatDate(convention["Date de fin du stage"]);
+
   return (
     <div className="mt-2 p-4 bg-gray-50 rounded-lg shadow-inner">
-      <p>
-        <strong>Entité principale - Identifiant OP:</strong>{" "}
-        {convention["Entité principale - Identifiant OP"]}
-      </p>
-      <p>
-        <strong>Date de début du stage:</strong>{" "}
-        {new Date(convention["Date de début du stage"]).toLocaleDateString()}
-      </p>
-      <p>
-        <strong>Date de fin du stage:</strong>{" "}
-        {new Date(convention["Date de fin du stage"]).toLocaleDateString()}
-      </p>
-      <p>
-        <strong>Stage Fonction occupée:</strong>{" "}
-        {convention["Stage Fonction occupée"]}
-      </p>
-      <p>
-        <strong>Pays où se déroule le stage</strong>{" "}
-        {convention.Pays?.toLowerCase() === "israel"
-          ? "unknown country, FREE PALESTINE"
-          : convention.Pays}
-      </p>
-      <p>
-        <strong>Nom Stage:</strong> {convention["Nom Stage"]}
-      </p>
+      {/* Conditionally render each field */}
+      {convention["Entité principale - Identifiant OP"] && (
+        <p>
+          <strong>Entité principale - Identifiant OP:</strong>{" "}
+          {convention["Entité principale - Identifiant OP"]}
+        </p>
+      )}
+      {formattedStartDate && (
+        <p>
+          <strong>Date de début du stage:</strong> {formattedStartDate}
+        </p>
+      )}
+      {formattedEndDate && (
+        <p>
+          <strong>Date de fin du stage:</strong> {formattedEndDate}
+        </p>
+      )}
+      {convention["Stage Fonction occupée"] && (
+        <p>
+          <strong>Stage Fonction occupée:</strong>{" "}
+          {convention["Stage Fonction occupée"]}
+        </p>
+      )}
+      {convention["ENTREPRISE DE STAGE"] && (
+        <p>
+          <strong>Entreprise de stage:</strong>{" "}
+          {convention["ENTREPRISE DE STAGE"]}
+        </p>
+      )}
+      {convention.Pays && (
+        <p>
+          <strong>Pays où se déroule le stage:</strong>{" "}
+          {convention.Pays.toLowerCase() === "israel"
+            ? "unknown country, FREE PALESTINE"
+            : convention.Pays}
+        </p>
+      )}
+      {convention["Nom Stage"] && (
+        <p>
+          <strong>Nom Stage:</strong> {convention["Nom Stage"]}
+        </p>
+      )}
     </div>
   );
 };
@@ -213,26 +248,38 @@ interface UniversiteVisitantCardProps {
 const UniversiteVisitantCard: React.FC<UniversiteVisitantCardProps> = ({
   universite,
 }) => {
+  // Format dates using the utility function
+  const formattedStartDate = formatDate(universite["Date de début mobilité"]);
+  const formattedEndDate = formatDate(universite["Date de fin mobilité"]);
+
   return (
     <div className="mt-2 p-4 bg-gray-50 rounded-lg shadow-inner">
-      <p>
-        <strong>Entité principale - Identifiant OP:</strong>{" "}
-        {universite["Entité principale - Identifiant OP"]}
-      </p>
-      <p>
-        <strong>Date de début mobilité:</strong>{" "}
-        {new Date(universite["Date de début mobilité"]).toLocaleDateString()}
-      </p>
-      <p>
-        <strong>Date de fin mobilité:</strong>{" "}
-        {new Date(universite["Date de fin mobilité"]).toLocaleDateString()}
-      </p>
-      <p>
-        <strong>Type Mobilité:</strong> {universite["Type Mobilité"]}
-      </p>
-      <p>
-        <strong>Nom mobilité:</strong> {universite["Nom mobilité"]}
-      </p>
+      {universite["Entité principale - Identifiant OP"] && (
+        <p>
+          <strong>Entité principale - Identifiant OP:</strong>{" "}
+          {universite["Entité principale - Identifiant OP"]}
+        </p>
+      )}
+      {formattedStartDate && (
+        <p>
+          <strong>Date de début mobilité:</strong> {formattedStartDate}
+        </p>
+      )}
+      {formattedEndDate && (
+        <p>
+          <strong>Date de fin mobilité:</strong> {formattedEndDate}
+        </p>
+      )}
+      {universite["Type Mobilité"] && (
+        <p>
+          <strong>Type Mobilité:</strong> {universite["Type Mobilité"]}
+        </p>
+      )}
+      {universite["Nom mobilité"] && (
+        <p>
+          <strong>Nom mobilité:</strong> {universite["Nom mobilité"]}
+        </p>
+      )}
     </div>
   );
 };
@@ -257,7 +304,7 @@ function Modal({ onClose, children }: ModalProps) {
         animate={{ scale: 1, opacity: 1 }}
         exit={{ scale: 0.8, opacity: 0 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        onClick={(e: React.MouseEvent<HTMLElement>) => e.stopPropagation()} // Prevent closing when clicking inside the modal
+        onClick={(e: React.MouseEvent<HTMLElement>) => e.stopPropagation()}
       >
         <button
           type="button"

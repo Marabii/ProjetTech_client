@@ -24,6 +24,7 @@ export interface ConventionDeStage {
   Pays?: string;
   Ville?: string;
   "Ville (Hors France)"?: string;
+  "ENTREPRISE DE STAGE": string;
 }
 
 export interface UniversiteVisitant {

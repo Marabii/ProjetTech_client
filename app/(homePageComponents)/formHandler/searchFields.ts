@@ -82,7 +82,11 @@ export const searchFields = {
       type: "text",
       label: "Ville hors France où se déroule le stage",
     },
-    // Fields from "UNIVERSITE visitant"
+    {
+      name: "CONVENTION DE STAGE.ENTREPRISE DE STAGE",
+      type: "text",
+      label: "Entreprise de stage",
+    },
     {
       name: "UNIVERSITE visitant.Date de début mobilité",
       type: "date",
