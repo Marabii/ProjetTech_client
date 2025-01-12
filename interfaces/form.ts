@@ -51,3 +51,15 @@ export interface CustomSelectProps {
   name: string;
   defaultValue?: string;
 }
+
+export interface SearchField {
+  name: string;
+  type: "text" | "date";
+  label: string;
+  context?: Record<string, string>[];
+}
+
+export interface SearchFields {
+  commonSearch: SearchField[];
+  advancedSearch: SearchField[];
+}

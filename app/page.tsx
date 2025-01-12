@@ -33,7 +33,7 @@ const StudentQueryForm: React.FC = () => {
       value: "decreasing",
     },
   ];
-  const isEmptySearch = students.length === 0 && wasSubmitted && !pending;
+  const isEmptySearch = students?.length === 0 && wasSubmitted && !pending;
 
   useEffect(() => {
     if (actionReturn?.data) {
@@ -107,7 +107,7 @@ const StudentQueryForm: React.FC = () => {
 
   return (
     <motion.form
-      className="max-w-7xl mx-auto p-6 bg-white shadow-lg rounded-lg"
+      className="max-w-7xl -z-20 mx-auto p-6 bg-white shadow-lg rounded-lg"
       action={formAction}
       autoComplete="off"
       initial="hidden"

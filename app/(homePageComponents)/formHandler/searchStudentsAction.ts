@@ -1,21 +1,45 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use server";
 
-import { ActionReturnWithData, SearchResult, Status } from "@/interfaces/form";
+import {
+  ActionReturnWithData,
+  SearchField,
+  SearchResult,
+  Status,
+} from "@/interfaces/form";
 import { searchFields } from "@/app/(homePageComponents)/formHandler/searchFields";
 import { fetchStudents } from "./fetchStudents";
+
+export interface ParsedFormData {
+  [key: string]: Array<{
+    inputValue: FormDataEntryValue;
+    context: Record<string, string>[];
+  }>;
+}
 
 export async function searchStudentsAction(
   actionReturn: ActionReturnWithData<SearchResult>,
   formData: FormData
 ): Promise<ActionReturnWithData<SearchResult>> {
-  const parsedFormData: { [key: string]: FormDataEntryValue } = {};
+  const parsedFormData: ParsedFormData = {};
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const [_, category] of Object.entries(searchFields)) {
-    category.forEach((input) => {
+    category.forEach((input: SearchField) => {
       const fieldValue = formData.get(input.name);
       if (fieldValue) {
-        parsedFormData[input.name] = fieldValue;
+        const [baseName, uniqueId] = input.name.split("/");
+        // For simpler fields (that don't have "/"), uniqueId might be `undefined`
+
+        // Initialize the array if it doesn’t exist yet
+        if (!parsedFormData[baseName]) {
+          parsedFormData[baseName] = [];
+        }
+
+        // Push a new entry for this field
+        parsedFormData[baseName].push({
+          inputValue: fieldValue,
+          context: input.context || [],
+        });
       }
     });
   }

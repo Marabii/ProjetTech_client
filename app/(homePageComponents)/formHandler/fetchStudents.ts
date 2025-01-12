@@ -1,8 +1,9 @@
 import { ActionReturnWithData, SearchResult } from "@/interfaces/form";
 import { queryProcessor } from "./queryProcessor";
+import { ParsedFormData } from "./searchStudentsAction";
 
 export async function fetchStudents(
-  parsedFormData: { [key: string]: unknown },
+  parsedFormData: ParsedFormData,
   currentPage: number,
   sortingOrder: string
 ): Promise<ActionReturnWithData<SearchResult>> {

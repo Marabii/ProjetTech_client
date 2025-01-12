@@ -20,7 +20,7 @@ const FiliereDistributionChart: React.FC = () => {
     fetch(`${process.env.NEXT_PUBLIC_BACKEND}/api/stats/filiere-distribution`)
       .then((res) => res.json())
       .then((json) => setData(json))
-      .catch((err) => setData({ error: "Failed to fetch data" }));
+      .catch(() => setData({ error: "Failed to fetch data" }));
   }, []);
 
   if (!data) {

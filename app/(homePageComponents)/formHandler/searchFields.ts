@@ -1,6 +1,8 @@
 // searchFields.ts
 
-export const searchFields = {
+import { SearchFields } from "@/interfaces/form";
+
+export const searchFields: SearchFields = {
   commonSearch: [
     {
       name: "ANNÉE DE DIPLOMATION",
@@ -113,9 +115,16 @@ export const searchFields = {
       label: "Défi",
     },
     {
-      name: "DéfiEtMajeure.majeures.nom",
+      name: "DéfiEtMajeure.majeures.nom/2A",
       type: "text",
-      label: "Majeure",
+      label: "Majeure Pour éléves 2A",
+      context: [{ "DéfiEtMajeure.majeures.promo": "2A" }],
+    },
+    {
+      name: "DéfiEtMajeure.majeures.nom/3A",
+      type: "text",
+      label: "Majeure Pour éléves 3A",
+      context: [{ "DéfiEtMajeure.majeures.promo": "3A" }],
     },
   ],
 };

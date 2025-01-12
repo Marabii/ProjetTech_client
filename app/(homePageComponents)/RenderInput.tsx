@@ -1,12 +1,10 @@
 "use client";
 import useOutsideClick from "@/hooks/useOutsideClick";
+import { SearchField } from "@/interfaces/form";
 import { useState, useCallback, useEffect, useRef } from "react";
 
-interface RenderInputProps {
-  name: string;
-  type?: "text" | "date";
-  label?: string;
-  resetTrigger: number; // New prop to trigger reset
+interface RenderInputProps extends SearchField {
+  resetTrigger: number;
 }
 
 const RenderInput: React.FC<RenderInputProps> = ({
@@ -20,24 +18,28 @@ const RenderInput: React.FC<RenderInputProps> = ({
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const inputRef = useRef<HTMLDivElement>(null);
+  const inputName = name.split("/")[0];
 
   useOutsideClick(inputRef, () => {
     setIsInputActive(false);
     setSuggestions([]);
   });
 
-  const debounce = (func: (...args: any[]) => void, delay: number) => {
+  const debounce = (
+    func: (inputName: string, query: string) => void,
+    delay: number
+  ) => {
     let timer: NodeJS.Timeout;
-    return (...args: any[]) => {
+    return (inputName: string, query: string) => {
       clearTimeout(timer);
-      timer = setTimeout(() => func(...args), delay);
+      timer = setTimeout(() => func(inputName, query), delay);
     };
   };
 
   const debouncedFetchSuggestions = useCallback(
     debounce(
-      (name: string, query: string) =>
-        fetchSuggestions(name, query, setIsInputActive, setSuggestions),
+      (inputName: string, query: string) =>
+        fetchSuggestions(inputName, query, setIsInputActive, setSuggestions),
       300
     ),
     []
@@ -62,13 +64,13 @@ const RenderInput: React.FC<RenderInputProps> = ({
         setError(null);
       }
     } else {
-      debouncedFetchSuggestions(name, value);
+      debouncedFetchSuggestions(inputName, value);
     }
   };
 
   const handleInputFocus = () => {
     if (type !== "date") {
-      fetchSuggestions(name, "", setIsInputActive, setSuggestions);
+      fetchSuggestions(inputName, "", setIsInputActive, setSuggestions);
     }
   };
 
@@ -99,7 +101,7 @@ const RenderInput: React.FC<RenderInputProps> = ({
       />
       {error && <p className="text-red-500 text-sm mt-1">{error}</p>}
       {isInputActive && suggestions && suggestions.length > 0 && (
-        <div className="absolute bg-white border w-full mt-1 max-h-40 overflow-y-auto z-10 transition-opacity duration-300">
+        <div className="absolute bg-white border w-full mt-1 max-h-40 overflow-y-auto z-30 transition-opacity duration-300">
           {suggestions.map((suggestion, index) => (
             <div
               key={index}
@@ -108,7 +110,7 @@ const RenderInput: React.FC<RenderInputProps> = ({
                 setSuggestions([]);
                 setIsInputActive(false);
               }}
-              className="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+              className="px-3 py-2 z-40 hover:bg-gray-100 cursor-pointer"
             >
               {suggestion}
             </div>
