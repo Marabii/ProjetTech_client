@@ -86,6 +86,6 @@ export function queryProcessor(formData: ParsedFormData) {
       ? { $and: queryConditions }
       : queryConditions[0] || {};
 
-  // console.log("finalQuery:", JSON.stringify(finalQuery, null, 2));
+  console.log("finalQuery:", JSON.stringify(finalQuery, null, 2));
   return finalQuery;
 }

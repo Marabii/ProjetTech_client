@@ -5,6 +5,7 @@ import { useState, useCallback, useEffect, useRef } from "react";
 
 interface RenderInputProps extends SearchField {
   resetTrigger: number;
+  onChange?: () => void;
 }
 
 const RenderInput: React.FC<RenderInputProps> = ({
